@@ -1,0 +1,35 @@
+{
+  "name": "bounty-dapp",
+  "version": "1.0.0",
+  "description": "Bounty dApp - Consensys Scholarship Final Project",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "bash startGanache.sh && truffle test && bash stopGanache.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/remedcu/Bounty-dApp.git"
+  },
+  "keywords": [
+    "Bounty",
+    "Blockchain",
+    "Solidity",
+    "Truffle",
+    "Smart",
+    "Contract"
+  ],
+  "author": "Shebin John",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/remedcu/Bounty-dApp/issues"
+  },
+  "homepage": "https://github.com/remedcu/Bounty-dApp#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "ganache-cli": "^6.8.1",
+    "truffle-hdwallet-provider": "^1.0.17"
+  }
+}
