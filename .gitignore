@@ -109,3 +109,6 @@ build
 
 # Mnemonic for Rinkeby Wallet
 .secret
+
+# Containing ABI, JSON, etc files.
+/bin
