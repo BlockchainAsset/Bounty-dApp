@@ -31,7 +31,6 @@ contract bountydAppv1 is Stoppable{
         uint256 acceptedSolutionID; /// @dev For storing which solution was accepted for this bounty
         statusIndicator status; /// @dev To store whether the bounty is Open or Closed
         address bountyCreator; /// @dev To store the bounty initiator's address
-        uint256[] solutionList; /// @dev To store all the solutionIDs of submitted solution
         string description; /// @dev To store the details of the bounty to be done
     }
 
@@ -47,9 +46,9 @@ contract bountydAppv1 is Stoppable{
 
     uint256 public bountyID;
     uint256 public solutionID;
-    uint256 public disputeStartIndex;
-    uint256 public disputeID;
-    address[3] public resolvers; /// @dev These stores the dispute revolvers addresses. Currently hardcorded at the time of instantiation.
+    uint256 public noOfResolvers; /// @dev This is to store the length of the resolvers + 1
+    uint256 public majority; /// @dev This is to store the majority of resolvers
+    address[] public resolvers; /// @dev These stores the dispute revolvers addresses. Currently hardcorded at the time of instantiation.
     uint256[] public disputeQueue;
 
     mapping (address => uint256) public balances; /// @dev To store the balances of users
@@ -57,6 +56,7 @@ contract bountydAppv1 is Stoppable{
     mapping (uint256 => SolutionDetails) public solutions; /// @dev To store the solution based on solutionID
     mapping (address => uint256[]) public addressToBountyList; /// @dev To store the bounties created by a single user
     mapping (address => uint256[]) public addressToSolutionList; /// @dev To store the solutions created by a single user
+    mapping (uint256 => uint256[]) public bountyToSolutionList; /// @dev To store all the solutionIDs of submitted solution in a single bounty
     mapping (uint256 => uint256[3]) public disputeQueueVotes;
     mapping (uint256 => uint256[3]) public disputeQueueSigner;
 
@@ -70,8 +70,10 @@ contract bountydAppv1 is Stoppable{
     event Deposit(address indexed from, uint256 value);
     event Withdrawed(address indexed to, uint256 value);
 
-    constructor(address resolverOne, address resolverTwo, address resolverThree, bool initialRunState) public Stoppable(initialRunState) {
-        resolvers = [resolverOne, resolverTwo, resolverThree];
+    constructor(address[] memory _resolvers, bool initialRunState) public Stoppable(initialRunState) {
+        resolvers = _resolvers;
+        noOfResolvers = _resolvers.length;
+        majority = (_resolvers.length.div(2)).add(1);
     }
 
     /**
@@ -100,7 +102,10 @@ contract bountydAppv1 is Stoppable{
         deposit(); /// @dev to handle any deposits
 
         uint256 balance = balances[msg.sender]; /// @dev Decrease storage read operations
-        require(_amount >= balance, "Not enough balance to create Bounty");
+        require(_amount <= balance, "Not enough balance to create Bounty");
+        if(_deadline > 0){
+            require(_deadline > now, "Deadline specified is already passed");
+        }
 
         balances[msg.sender] = balance.sub(_amount);
 
@@ -163,14 +168,19 @@ contract bountydAppv1 is Stoppable{
             require(_deadline > now, "Bounty Deadline has Reached!");
         }
 
-        uint256 _solutionID = createBountyID();
+        uint256 _solutionID = createSolutionID();
 
         solutions[_solutionID].bountyID = _bountyID;
-        solutions[_solutionID].linkedSolution = _linkedSolution;
+        if(_linkedSolution == 0){
+            solutions[_solutionID].linkedSolution = _solutionID;
+        }
+        else{
+            solutions[_solutionID].linkedSolution = _linkedSolution;
+        }
         solutions[_solutionID].bountyHunter = msg.sender;
         solutions[_solutionID].solution = _solution;
 
-        bounties[_bountyID].solutionList.push(_solutionID);
+        bountyToSolutionList[_bountyID].push(_solutionID);
         addressToSolutionList[msg.sender].push(_solutionID);
 
         emit SolutionCreated(_bountyID, _solutionID, msg.sender);
@@ -229,15 +239,13 @@ contract bountydAppv1 is Stoppable{
     }
 
     /**
-    *   @notice This function helps to create a unique dispute ID
-    *   @dev Takes no inputs and returns unique disputeID recently created
-    *   @return disputeID in uint256, which defines the newly created dispute's ID
+    *   @notice This function helps to get the length of the Dispute Queue
+    *   @dev Takes no inputs and returns length of Dispute Queue
+    *   @return dispute queue length in uint256
     */
-    function createDisputeID() internal returns(uint256){
+    function disputeQueueLength() public view returns(uint256){
 
-        uint256 _disputeID = disputeID.add(1);
-        disputeID = _disputeID;
-        return _disputeID;
+        return disputeQueue.length;
 
     }
 
@@ -255,8 +263,7 @@ contract bountydAppv1 is Stoppable{
         require(bounties[_bountyID].acceptedSolutionID == 0, "Amount already won by someone else");
         require(bounties[_bountyID].status == statusIndicator.Open, "Only open bounties can be disputed");
 
-        disputeQueue[disputeID] = _solutionID;
-        createDisputeID();
+        disputeQueue.push(_solutionID);
 
         bounties[_bountyID].status = statusIndicator.Disputed;
         solutions[_solutionID].disputeStatus = disputeIndicator.Yes;
@@ -271,20 +278,22 @@ contract bountydAppv1 is Stoppable{
     *   @notice This function helps to check a dispute on solution raised by a hunter which was rejected
     *   @dev For the dispute to be solved a majority is formed from approved resolvers
     *   @param _vote The vote given by the resolver
+    *   @param _disputeIndex The index of the disputed solution
     *   @return status in bool
     */
-    function solveDispute(uint256 _vote) public onlyIfRunning returns(bool){
+    function solveDispute(uint256 _disputeIndex, uint256 _vote) public onlyIfRunning returns(bool){
 
-        uint256 _index = 10;
-        uint256 _solutionID = disputeQueue[disputeStartIndex];
+        uint256 _index = noOfResolvers;
+        uint256 _solutionID = disputeQueue[_disputeIndex];
         for(uint256 i = 0; i < resolvers.length; i++){
             if(resolvers[i] == msg.sender){
                 _index = i;
             }
         }
-        require(_index != 10, "Only a resolver can call this function");
+        require(_index != noOfResolvers, "Only a resolver can call this function");
         require(disputeQueueSigner[_solutionID][_index] == 0, "Already Signed");
         require(_vote == 0 || _vote == 1, "Either rejected or acccepted");
+        require(solutions[_solutionID].disputeStatus == disputeIndicator.Yes, "Dispute solved already");
 
         disputeQueueVotes[_solutionID][_index] = _vote;
         disputeQueueSigner[_solutionID][_index] = 1;
@@ -293,7 +302,7 @@ contract bountydAppv1 is Stoppable{
         for(uint256 i = 0; i < disputeQueueSigner[_solutionID].length; i++) {
             allSigned = allSigned.add(disputeQueueSigner[_solutionID][i]);
         }
-        if(allSigned == 3){
+        if(allSigned >= majority){
 
             uint256 result;
             for(uint256 i = 0; i < disputeQueueVotes[_solutionID].length; i++) {
@@ -302,32 +311,32 @@ contract bountydAppv1 is Stoppable{
 
             uint256 _bountyID = solutions[_solutionID].bountyID;
 
-            if(result > 1){
+            if(result >= majority){
 
                 bounties[_bountyID].acceptedSolutionID = _solutionID;
                 bounties[_bountyID].status = statusIndicator.Closed;
                 solutions[_solutionID].acceptanceStatus = acceptanceIndicator.Accepted;
+                solutions[_solutionID].disputeStatus = disputeIndicator.Done;
 
                 address _bountyHunter = solutions[_solutionID].bountyHunter;
 
                 emit BountyClosedWithWinner(_bountyID, msg.sender, _bountyHunter);
 
                 balances[_bountyHunter] = balances[_bountyHunter].add(bounties[_bountyID].amount);
+                emit DisputeSolved(_bountyID, _solutionID);
 
             }
-            else {
+            else if (allSigned == noOfResolvers) {
 
                 bounties[_bountyID].status = statusIndicator.Open;
+                solutions[_solutionID].disputeStatus = disputeIndicator.Done;
+                emit DisputeSolved(_bountyID, _solutionID);
 
             }
 
-            solutions[_solutionID].disputeStatus = disputeIndicator.Done;
-
-            emit DisputeSolved(_bountyID, _solutionID);
-
-            disputeStartIndex = disputeStartIndex.add(1);
-
         }
+
+        return true;
 
     }
 
@@ -339,9 +348,9 @@ contract bountydAppv1 is Stoppable{
     */
     function closeBounty(uint256 _bountyID) public onlyIfRunning returns(bool){
 
+        require(bounties[_bountyID].bountyCreator == msg.sender, "Only Bounty Creator can close its bounty");
         require(bounties[_bountyID].status == statusIndicator.Open, "Only open bounties can be closed.");
         require(bounties[_bountyID].deadline < now, "Only bounties whose deadline has been passed can be closed.");
-        require(bounties[_bountyID].bountyCreator == msg.sender, "Only Bounty Creator can close its bounty");
 
         bounties[_bountyID].status = statusIndicator.Closed;
 
