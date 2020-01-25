@@ -7,6 +7,10 @@ before_script:
   - npm install -g truffle@5.0.0
 
 script:
-  - ganache-cli &
+  - ganache-cli
   - sleep 5
   - truffle test
+
+env:
+  - WAIT_TIME_IN_CONTRACT = 10
+  - WAIT_TIME_IN_TEST = 30

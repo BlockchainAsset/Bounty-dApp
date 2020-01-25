@@ -1,0 +1,15 @@
+# Rinkeby Network Details
+INFURA_RINKEBY_KEY = Enter_Your_Rinkeby_Key_Here
+RINKEBY_MNEMONIC = Enter Your Rinkeby Mnemonic
+
+# Hard Coded Address of Resolvers for Dispute in Rinkeby
+RESOLVER_ONE = Add Resolver One Address
+RESOLVER_TWO = Add Resolver Two Address
+RESOLVER_THREE = Add Resolver Three Address
+
+# true to set the contract state as running and false for contract state as paused while deploying.
+INITIAL_STATE = true
+
+# If test fails in any network, change these time to correct it. Sorry for the trouble
+WAIT_TIME_IN_CONTRACT = 10
+WAIT_TIME_IN_TEST = 30
