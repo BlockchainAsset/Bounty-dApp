@@ -6,6 +6,12 @@ var initialState = process.env.INITIAL_STATE;
 
 module.exports = function(deployer, network, accounts) {
 
-  deployer.deploy(BountydAppv1, [resolverOne, resolverTwo, resolverThree], initialState);
+  if (network == "development") {
+    [owner, alice, bob, carol, resolverOne, resolverTwo, resolverThree] = accounts;
+    deployer.deploy(BountydAppv1, [resolverOne, resolverTwo, resolverThree], initialState);
+  }
+  else {
+    deployer.deploy(BountydAppv1, [resolverOne, resolverTwo, resolverThree], initialState);
+  }
 
 };
