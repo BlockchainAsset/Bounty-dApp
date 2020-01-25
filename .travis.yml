@@ -7,10 +7,7 @@ before_script:
   - npm install -g truffle@5.0.0
 
 script:
+  - curl -o .env https://raw.githubusercontent.com/remedcu/Bounty-dApp/dev/.travis.yml
   - ganache-cli &
   - sleep 5
   - truffle test --network development
-
-env:
-  - WAIT_TIME_IN_CONTRACT = 10
-  - WAIT_TIME_IN_TEST = 30
