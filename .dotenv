@@ -1,11 +1,7 @@
 # Rinkeby Network Details
-INFURA_RINKEBY_KEY = Enter_Your_Rinkeby_Key_Here
+INFURA_KEY = Enter_Your_Infura_Key_Here
 RINKEBY_MNEMONIC = Enter Your Rinkeby Mnemonic
-
-# Hard Coded Address of Resolvers for Dispute in Rinkeby
-RESOLVER_ONE = Add Resolver One Address
-RESOLVER_TWO = Add Resolver Two Address
-RESOLVER_THREE = Add Resolver Three Address
+ROPSTEN_MNEMONIC = Enter Your Ropsten Menmonic
 
 # true to set the contract state as running and false for contract state as paused while deploying.
 INITIAL_STATE = true

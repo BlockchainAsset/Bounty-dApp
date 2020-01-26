@@ -47,7 +47,7 @@ contract('bountydAppv1', (accounts) => {
   });
 
   beforeEach("Creating New Instance", async function() {
-    bdAv1Instance = await bdAv1.new([resolverOne, resolverTwo, resolverThree], { from: owner});
+    bdAv1Instance = await bdAv1.new(true, { from: owner});
     _bountyIDReceipt = await bdAv1Instance.createBounty(amount, deadline, description, {from: alice, value: amount});
     _bountyID = _bountyIDReceipt.receipt.logs[1].args.bountyID;
     _solutionIDReceiptOne = await bdAv1Instance.addSolution(_bountyID, zeroInBN, solution, {from: bob});
@@ -58,6 +58,9 @@ contract('bountydAppv1', (accounts) => {
     _solutionIDThree = _solutionIDReceiptThree.receipt.logs[0].args.solutionID;
     await bdAv1Instance.rejectSolution(_solutionIDTwo, comment, {from: alice});
     await bdAv1Instance.raiseDispute(_solutionIDTwo, {from: bob});
+    await bdAv1Instance.addResolver(resolverOne, {from: owner});
+    await bdAv1Instance.addResolver(resolverTwo, {from: owner});
+    await bdAv1Instance.addResolver(resolverThree, {from: owner});
   });
 
   describe("Function: solveDispute", function() {
@@ -135,11 +138,11 @@ contract('bountydAppv1', (accounts) => {
 
     describe("Edge Cases", function() {
 
-      it('solveDispute function can be called by Resolvers only', async () => {
+      it('solveDispute function can be called by Valid Resolvers only', async () => {
         await truffleAssert.fails(
           bdAv1Instance.solveDispute(_disputeIndexZero, zeroInBN, {from: bob}),
           null,
-          'Only a resolver can call this function'
+          'Only a Valid resolver can call this function'
         );
       });
 
