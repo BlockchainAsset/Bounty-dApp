@@ -31,10 +31,10 @@ contract('bountydAppv1', (accounts) => {
   before("Preparing Accounts and Initial Checks", async function() {
     assert.isAtLeast(accounts.length, 7, "Atleast three accounts required");
 
-    // Setup 4 accounts.
+    // Setup 7 accounts.
     [owner, alice, bob, carol, resolverOne, resolverTwo, resolverThree] = accounts;
 
-    //Checking if all accounts have atleast 2 ETH or more for test
+    //Checking if all accounts have atleast 1 ETH or more for test
     assert.isTrue((new BN(await web3.eth.getBalance(owner))).gt(oneEtherInWei), "Owner Account has less than 1 ETH");
     assert.isTrue((new BN(await web3.eth.getBalance(alice))).gt(oneEtherInWei), "Alice Account has less than 1 ETH");
     assert.isTrue((new BN(await web3.eth.getBalance(bob))).gt(oneEtherInWei), "Bob Account has less than 1 ETH");
@@ -46,7 +46,7 @@ contract('bountydAppv1', (accounts) => {
   });
 
   beforeEach("Creating New Instance", async function() {
-    bdAv1Instance = await bdAv1.new([resolverOne, resolverTwo, resolverThree], { from: owner});
+    bdAv1Instance = await bdAv1.new(true, { from: owner});
     _bountyIDReceipt = await bdAv1Instance.createBounty(amount, deadline, description, {from: alice, value: amount});
     _bountyID = _bountyIDReceipt.receipt.logs[1].args.bountyID;
     _solutionIDReceiptOne = await bdAv1Instance.addSolution(_bountyID, zeroInBN, solution, {from: bob});

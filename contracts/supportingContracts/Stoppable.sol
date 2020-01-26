@@ -12,8 +12,8 @@ contract Stoppable is Owned {
     event LogStoppedContract(address indexed sender);
 
     modifier onlyIfRunning {
-        require(isRunning, "Contract is Paused at the moment");
         require(!isStopped, "Contract is Stopped permanently");
+        require(isRunning, "Contract is Paused at the moment");
         _;
     }
 
@@ -42,6 +42,14 @@ contract Stoppable is Owned {
         isStopped = true;
         emit LogStoppedContract(msg.sender);
         return true;
+    }
+
+    function getRunningStatus() public view returns(bool){
+        return isRunning;
+    }
+
+    function getStopStatus() public view returns(bool){
+        return isStopped;
     }
 
 }

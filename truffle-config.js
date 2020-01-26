@@ -22,8 +22,11 @@ const HDWalletProvider = require('truffle-hdwallet-provider');
 
 require('dotenv').config()
 
-const infuraKey = "https://rinkeby.infura.io/v3/"+process.env.INFURA_RINKEBY_KEY;
-const mnemonic = process.env.RINKEBY_MNEMONIC;
+const infuraRinkebyKey = "https://rinkeby.infura.io/v3/"+process.env.INFURA_KEY;
+const rinkebyMnemonic = process.env.RINKEBY_MNEMONIC;
+
+const infuraRopstenKey = "https://ropsten.infura.io/v3/"+process.env.INFURA_KEY;
+const ropstenMnemonic = process.env.ROPSTEN_MNEMONIC;
 
 module.exports = {
   plugins: [ "truffle-security" ],
@@ -50,7 +53,7 @@ module.exports = {
      network_id: "*",       // Any network (default: none)
     },
 
-    test: {
+    test: { // This is only for Truffle Teams, something I am currently testing, please avoid.
       host: "localhost",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
@@ -66,12 +69,18 @@ module.exports = {
    // },
 
    rinkeby: {
-     provider: () => new HDWalletProvider(mnemonic, infuraKey),
+     provider: () => new HDWalletProvider(rinkebyMnemonic, infuraRinkebyKey),
      network_id: 4,          // Rinkeby's network id
      gas: 5500000,        
    },
 
-   // Useful for deploying to a public network.
+   ropsten: {
+    provider: () => new HDWalletProvider(ropstenMnemonic, infuraRopstenKey),
+    network_id: 3,          // Ropsten's network id
+    gas: 5500000,
+   },
+
+  // Useful for deploying to a public network.
    // NB: It's important to wrap the provider as a function.
    // ropsten: {
      // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),

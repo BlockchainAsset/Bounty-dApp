@@ -49,7 +49,7 @@ contract('bountydAppv1', (accounts) => {
   });
 
   beforeEach("Creating New Instance", async function() {
-    bdAv1Instance = await bdAv1.new([resolverOne, resolverTwo, resolverThree], { from: owner});
+    bdAv1Instance = await bdAv1.new(true, { from: owner});
     let _bountyIDOneReceipt = await bdAv1Instance.createBounty(amount, deadline, description, {from: alice, value: amount});
     _bountyIDOne = _bountyIDOneReceipt.receipt.logs[1].args.bountyID;
     let _bountyIDTwoReceipt = await bdAv1Instance.createBounty(amount, deadline, description, {from: alice, value: amount});

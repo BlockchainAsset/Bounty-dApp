@@ -13,6 +13,10 @@ contract bountydAppv1 is Stoppable{
 
     using SafeMath for uint256;
 
+    enum resolverIndicator {
+        Invalid, Valid /// @dev By default is Invalid. Validated by the owner
+    }
+
     enum statusIndicator {
         Open, Disputed, Closed /// @dev By default in Open. Disputed/Closed by the hunter/user
     }
@@ -46,20 +50,24 @@ contract bountydAppv1 is Stoppable{
 
     uint256 public bountyID;
     uint256 public solutionID;
-    uint256 public noOfResolvers; /// @dev This is to store the length of the resolvers + 1
+    uint256 public noOfResolvers; /// @dev This is to store the no of valid resolvers only
+    uint256 public totalNoOfResolvers; /// @dev This is to store the no of resolvers in the resolvers array
     uint256 public majority; /// @dev This is to store the majority of resolvers
     address[] public resolvers; /// @dev These stores the dispute revolvers addresses. Currently hardcorded at the time of instantiation.
     uint256[] public disputeQueue;
 
     mapping (address => uint256) public balances; /// @dev To store the balances of users
+    mapping (address => resolverIndicator) public resolverStatus; /// @dev Indicate whether a resolver is valid or not
     mapping (uint256 => BountyDetails) public bounties; /// @dev To store the bounty based on bountyID
     mapping (uint256 => SolutionDetails) public solutions; /// @dev To store the solution based on solutionID
     mapping (address => uint256[]) public addressToBountyList; /// @dev To store the bounties created by a single user
     mapping (address => uint256[]) public addressToSolutionList; /// @dev To store the solutions created by a single user
     mapping (uint256 => uint256[]) public bountyToSolutionList; /// @dev To store all the solutionIDs of submitted solution in a single bounty
-    mapping (uint256 => uint256[3]) public disputeQueueVotes;
-    mapping (uint256 => uint256[3]) public disputeQueueSigner;
+    mapping (uint256 => uint256[10]) public disputeQueueVotes;
+    mapping (uint256 => uint256[10]) public disputeQueueSigner;
 
+    event ResolverAdded(address indexed resolverCreator, address indexed resolver);
+    event ResolverUpdated(address indexed resolverUpdater, address indexed resolver, resolverIndicator indexed status);
     event BountyCreated(uint256 indexed bountyID, address indexed bountyCreator, uint256 value);
     event SolutionCreated(uint256 indexed bountyID, uint256 indexed solutionID, address indexed solutionCreator);
     event SolutionRejected(uint256 indexed bountyID, uint256 indexed solutionID);
@@ -70,10 +78,76 @@ contract bountydAppv1 is Stoppable{
     event Deposit(address indexed from, uint256 value);
     event Withdrawed(address indexed to, uint256 value);
 
-    constructor(address[] memory _resolvers, bool initialRunState) public Stoppable(initialRunState) {
-        resolvers = _resolvers;
-        noOfResolvers = _resolvers.length;
-        majority = (_resolvers.length.div(2)).add(1);
+    constructor(bool initialRunState) public Stoppable(initialRunState) {
+    }
+
+    /**
+    *   @notice This function helps to add a new resolver
+    *   @dev Takes the address of the resolver and adds it to the resolver array
+    *   @param _resolver The address of the resolver
+    *   @return success or failure
+    */
+    function addResolver(address _resolver) public onlyOwner onlyIfRunning returns(bool){
+
+        require(resolverStatus[_resolver] == resolverIndicator.Invalid, "Already a Valid Resolver");
+        uint256 _totalNoOfResolvers = totalNoOfResolvers;
+        uint256 _index = _totalNoOfResolvers;
+        for(uint256 i = 0; i < _totalNoOfResolvers; i++){
+            if(address(resolvers[i]) == _resolver){
+                _index = i;
+            }
+        }
+        require(_index == _totalNoOfResolvers, "Resolver previously added by Owner, use updateResolver()");
+
+        resolvers.push(_resolver);
+        resolverStatus[_resolver] = resolverIndicator.Valid;
+        totalNoOfResolvers = _totalNoOfResolvers.add(1);
+        uint256 _noOfResolvers = noOfResolvers.add(1);
+        noOfResolvers = _noOfResolvers;
+        majority = (_noOfResolvers.div(2)).add(1);
+
+        emit ResolverAdded(msg.sender, _resolver);
+
+        return true;
+
+    }
+
+    /**
+    *   @notice This function helps to update a resolver status
+    *   @dev Takes the address of the resolver and updates it's status along with majority and noOfResolvers
+    *   @param _resolver The address of the resolver
+    *   @param _status The status of the resolver
+    *   @return success or failure
+    */
+    function updateResolver(address _resolver, resolverIndicator _status) public onlyOwner onlyIfRunning returns(bool){
+
+        uint256 _totalNoOfResolvers = totalNoOfResolvers;
+        uint256 _index = _totalNoOfResolvers;
+        for(uint256 i = 0; i < _totalNoOfResolvers; i++){
+            if(resolvers[i] == _resolver){
+                _index = i;
+            }
+        }
+        require(_index != _totalNoOfResolvers, "Resolver not previously added by Owner"); /// @dev To check concerned resolver is in Queue or not
+
+        uint256 _noOfResolvers = 0;
+        if(_status == resolverIndicator.Valid){
+            resolverStatus[_resolver] = resolverIndicator.Valid;
+            _noOfResolvers = noOfResolvers.add(1);
+            noOfResolvers = _noOfResolvers;
+        }
+        else{
+            resolverStatus[_resolver] = resolverIndicator.Invalid;
+            _noOfResolvers = noOfResolvers.sub(1);
+            noOfResolvers = _noOfResolvers;
+        }
+
+        majority = (_noOfResolvers.div(2)).add(1);
+
+        emit ResolverUpdated(msg.sender, _resolver, _status);
+
+        return true;
+
     }
 
     /**
@@ -283,14 +357,17 @@ contract bountydAppv1 is Stoppable{
     */
     function solveDispute(uint256 _disputeIndex, uint256 _vote) public onlyIfRunning returns(bool){
 
-        uint256 _index = noOfResolvers;
         uint256 _solutionID = disputeQueue[_disputeIndex];
-        for(uint256 i = 0; i < resolvers.length; i++){
+
+        require(resolverStatus[msg.sender] == resolverIndicator.Valid, "Only a Valid resolver can call this function");
+        uint256 _totalNoOfResolvers = totalNoOfResolvers;
+        uint256 _index = _totalNoOfResolvers;
+        for(uint256 i = 0; i < _totalNoOfResolvers; i++){
             if(resolvers[i] == msg.sender){
                 _index = i;
             }
         }
-        require(_index != noOfResolvers, "Only a resolver can call this function");
+        require(_index != _totalNoOfResolvers, "Only a resolver can call this function");
         require(disputeQueueSigner[_solutionID][_index] == 0, "Already Signed");
         require(_vote == 0 || _vote == 1, "Either rejected or acccepted");
         require(solutions[_solutionID].disputeStatus == disputeIndicator.Yes, "Dispute solved already");

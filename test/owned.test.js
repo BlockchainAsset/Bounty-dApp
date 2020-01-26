@@ -14,6 +14,7 @@ const zeroInBN = new BN(0);
 const oneInBN = new BN(1);
 const waitTimeInContract = new BN(60);
 const waitTimeInTest = 120;
+const zeroAdd = "0x0000000000000000000000000000000000000000";
 
 contract('bountydAppv1', (accounts) => {
 
@@ -41,39 +42,68 @@ contract('bountydAppv1', (accounts) => {
     bdAv1Instance = await bdAv1.new(true, { from: owner});
   });
 
-  describe("Function: deposit", function() {
+  describe("Contract: Owned", function() {
 
     describe("Basic Working", function() {
 
-      it('Should update the balance correctly during bounty creation', async () => {
-        let beforeFunctionCallValue = new BN(await bdAv1Instance.balances(alice));
-        await bdAv1Instance.createBounty(amount, deadline, description, {from: alice, value: amount});
-        let afterFunctionCallValue = new BN(await bdAv1Instance.balances(alice));
-
-        assert.strictEqual(beforeFunctionCallValue.toString(10), afterFunctionCallValue.toString(10), "Bounty ID don't match");
+      it('Only admin should be able to call addResolver', async () => {
+        await truffleAssert.fails(
+          bdAv1Instance.addResolver(resolverOne, {from: alice}),
+          null,
+          'Only owner can use this function'
+        );
       });
 
-      it('Should add the balance correctly during bounty creation', async () => {
-        await bdAv1Instance.createBounty(amount, deadline, description, {from: alice, value: amount.add(amount)});
-        let afterFunctionCallValue = new BN(await bdAv1Instance.balances(alice));
+      it('Only admin should be able to call updateResolver', async () => {
+        await truffleAssert.fails(
+          bdAv1Instance.updateResolver(resolverOne, zeroInBN, {from: alice}),
+          null,
+          'Only owner can use this function'
+        );
+      });
 
-        assert.strictEqual(amount.toString(10), afterFunctionCallValue.toString(10), "Bounty ID don't match");
+      it('Should update the owner correctly', async () => {
+        await bdAv1Instance.setOwner(resolverOne, {from: owner});
+
+        let _resolverOne = await bdAv1Instance.getOwner();
+  
+        assert.strictEqual(_resolverOne, resolverOne, "New Owner was not set correctly");
+      });
+
+    });
+
+    describe("Input Cases", function() {
+      
+      it('Without new Owner', async () => {
+        await truffleAssert.fails(
+          bdAv1Instance.setOwner({from: owner}),
+          null,
+          ''
+        );
+      });
+
+      it('New Owner as zero address', async () => {
+        await truffleAssert.fails(
+          bdAv1Instance.setOwner(zeroAdd, {from: owner}),
+          null,
+          ''
+        );
       });
 
     });
 
     describe("Event Cases", function() {
 
-      it("Should correctly emit the proper event: Deposit", async () => {
+      it("Should correctly emit the proper event: LogOwnerChanged", async () => {
 
-        let _bountyIDReceipt = await bdAv1Instance.createBounty(amount, deadline, description, {from: alice, value: amount});
+        let _setOwnerReceipt = await bdAv1Instance.setOwner(resolverOne, {from: owner});
 
-        assert.strictEqual(_bountyIDReceipt.logs.length, 2);
-        const log = _bountyIDReceipt.logs[0];
+        assert.strictEqual(_setOwnerReceipt.logs.length, 1);
+        const log = _setOwnerReceipt.logs[0];
     
-        assert.strictEqual(log.event, "Deposit");
-        assert.strictEqual(log.args.from, alice);
-        assert.strictEqual(log.args.value.toString(10), amount.toString(10));
+        assert.strictEqual(log.event, "LogOwnerChanged");
+        assert.strictEqual(log.args.newOwner, resolverOne);
+        assert.strictEqual(log.args.oldOwner, owner);
       });
 
     });

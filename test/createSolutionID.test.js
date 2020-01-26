@@ -23,10 +23,10 @@ contract('bountydAppv1', (accounts) => {
   before("Preparing Accounts and Initial Checks", async function() {
     assert.isAtLeast(accounts.length, 7, "Atleast three accounts required");
 
-    // Setup 4 accounts.
+    // Setup 7 accounts.
     [owner, alice, bob, carol, resolverOne, resolverTwo, resolverThree] = accounts;
 
-    //Checking if all accounts have atleast 2 ETH or more for test
+    //Checking if all accounts have atleast 1 ETH or more for test
     assert.isTrue((new BN(await web3.eth.getBalance(owner))).gt(oneEtherInWei), "Owner Account has less than 1 ETH");
     assert.isTrue((new BN(await web3.eth.getBalance(alice))).gt(oneEtherInWei), "Alice Account has less than 1 ETH");
     assert.isTrue((new BN(await web3.eth.getBalance(bob))).gt(oneEtherInWei), "Bob Account has less than 1 ETH");
@@ -38,7 +38,7 @@ contract('bountydAppv1', (accounts) => {
   });
 
   beforeEach("Creating New Instance", async function() {
-    bdAv1Instance = await bdAv1.new([resolverOne, resolverTwo, resolverThree], { from: owner});
+    bdAv1Instance = await bdAv1.new(true, { from: owner});
   });
 
   describe("Function: createSolutionID", function() {
