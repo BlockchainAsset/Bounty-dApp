@@ -9,3 +9,6 @@ INITIAL_STATE = true
 # If test fails in any network, change these time to correct it. Sorry for the trouble
 WAIT_TIME_IN_CONTRACT = 10
 WAIT_TIME_IN_TEST = 30
+
+# PORT for truffle-config
+PORT = 8545
