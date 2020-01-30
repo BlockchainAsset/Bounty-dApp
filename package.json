@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "./node_modules/.bin/webpack-cli --mode development && http-server ./build/app -a 0.0.0.0 -c-1",
+    "start": "./node_modules/.bin/webpack-cli --mode development && http-server ./build/app -a 0.0.0.0 -p 8080 -c-1",
     "build": "webpack-cli --mode development",
     "test": "bash startGanache.sh && truffle test && bash stopGanache.sh"
   },
@@ -43,5 +43,8 @@
   "devDependencies": {
     "webpack": "^4.41.5",
     "file-loader": "^4.0.0"
+  },
+  "engines": {
+    "node": "10.x"
   }
 }
