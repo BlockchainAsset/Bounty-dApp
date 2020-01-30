@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "webpack-cli --mode development && http-server ./build/app -a 0.0.0.0 -p 8080 -c-1",
+    "start": "webpack-cli --mode development && http-server ./build/app -a 0.0.0.0 -c-1",
     "build": "webpack-cli --mode development",
     "test": "bash startGanache.sh && truffle test && bash stopGanache.sh"
   },
