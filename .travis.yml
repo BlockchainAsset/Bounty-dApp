@@ -5,9 +5,13 @@ node_js:
 before_script:
   - npm install -g ganache-cli
   - npm install -g truffle@5.0.0
+  - bash startGanache.sh
 
 script:
   - curl -o .env https://raw.githubusercontent.com/remedcu/Bounty-dApp/dev/.dotenv
-  - ganache-cli &
-  - sleep 5
+  - truffle migrate
+  - webpack-cli --mode development
   - truffle test
+
+after_script:
+  - bash stopGanache.sh
