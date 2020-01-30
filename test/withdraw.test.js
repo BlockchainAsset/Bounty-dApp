@@ -60,9 +60,9 @@ contract('bountydAppv1', (accounts) => {
     await bdAv1Instance.closeBounty(_bountyIDOne, {from: alice});
   });
 
-  describe("Function: closeBounty", function() {
+  describe("Function: withdraw", function() {
 
-    describe("Function: withdraw", function() {
+    describe("Basic Working", function() {
 
       it('Should withdraw a winning amount correctly', async () => {
 

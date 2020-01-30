@@ -10,4 +10,4 @@ script:
   - curl -o .env https://raw.githubusercontent.com/remedcu/Bounty-dApp/dev/.dotenv
   - ganache-cli &
   - sleep 5
-  - truffle test --network development
+  - truffle test
