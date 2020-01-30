@@ -1,1 +1,1 @@
-web:npm i && npm run-script build && npm start
+web:npm i
