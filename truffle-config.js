@@ -49,15 +49,10 @@ module.exports = {
    //
    development: {
      host: "localhost",     // Localhost (default: none)
-     port: 8545,            // Standard Ethereum port (default: none)
+     port: process.env.PORT,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
     },
 
-    test: { // This is only for Truffle Teams, something I am currently testing, please avoid.
-      host: "localhost",     // Localhost (default: none)
-      port: 8545,            // Standard Ethereum port (default: none)
-      network_id: "*",       // Any network (default: none)
-     },
     // Another network with more advanced options...
    // advanced: {
      // port: 8777,             // Custom port
