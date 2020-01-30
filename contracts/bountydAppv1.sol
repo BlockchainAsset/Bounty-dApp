@@ -93,7 +93,7 @@ contract bountydAppv1 is Stoppable{
         uint256 _totalNoOfResolvers = totalNoOfResolvers;
         uint256 _index = _totalNoOfResolvers;
         for(uint256 i = 0; i < _totalNoOfResolvers; i++){
-            if(address(resolvers[i]) == _resolver){
+            if(resolvers[i] == _resolver){
                 _index = i;
             }
         }
@@ -132,11 +132,13 @@ contract bountydAppv1 is Stoppable{
 
         uint256 _noOfResolvers = 0;
         if(_status == resolverIndicator.Valid){
+            require(resolverStatus[_resolver] == resolverIndicator.Invalid, "The resolver is already valid");
             resolverStatus[_resolver] = resolverIndicator.Valid;
             _noOfResolvers = noOfResolvers.add(1);
             noOfResolvers = _noOfResolvers;
         }
         else{
+            require(resolverStatus[_resolver] == resolverIndicator.Valid, "The resolver is already Invalid");
             resolverStatus[_resolver] = resolverIndicator.Invalid;
             _noOfResolvers = noOfResolvers.sub(1);
             noOfResolvers = _noOfResolvers;
@@ -212,6 +214,29 @@ contract bountydAppv1 is Stoppable{
 
     }
 
+
+    /**
+    *   @notice This function helps to get the length of the Bounty submitted by a single user
+    *   @dev Takes no inputs and returns length of Bounty Queue
+    *   @return bounty queue length in uint256
+    */
+    function addressToBountyListLength() public view returns(uint256){
+
+        return addressToBountyList[msg.sender].length;
+
+    }
+
+    /**
+    *   @notice This function helps to get the length of the Solutions submitted to a single bounty
+    *   @dev Takes the bounty ID as input and returns length of Solutions submitted
+    *   @return solution queue length in uint256
+    */
+    function bountyToSolutionListLength(uint256 _bountyID) public view returns(uint256){
+
+        return bountyToSolutionList[_bountyID].length;
+
+    }
+
     /**
     *   @notice This function helps to create a unique solution ID
     *   @dev Takes no inputs and returns unique solutionID recently created
@@ -260,6 +285,17 @@ contract bountydAppv1 is Stoppable{
         emit SolutionCreated(_bountyID, _solutionID, msg.sender);
 
         return _solutionID;
+
+    }
+
+    /**
+    *   @notice This function helps to get the length of the Solution submitted by a single user
+    *   @dev Takes no inputs and returns length of Solution Queue
+    *   @return solution queue length in uint256
+    */
+    function addressToSolutionListLength() public view returns(uint256){
+
+        return addressToSolutionList[msg.sender].length;
 
     }
 

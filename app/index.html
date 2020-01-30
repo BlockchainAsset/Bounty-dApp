@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+    <head>
+    	<meta charset="UTF-8">
+        <title>Bounty dApp</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+    <div class="container container-login100">
+        <center>
+        <hr/>
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>User Info</h3>
+                <div>Address: <span id="currentUserAddress">(Loading...)</span></div><br>
+                <div>Type: <span id="currentUserType">(Loading...)</span></div>
+            </div>
+            <div class="col-sm-6">
+                <h3>Balances: </h3>
+                <div>Contract Balance: <span id="contractBalance">(Loading...)</span> Ether</div><br>
+                <div>User Balance: <span id="userBalance">(Loading...)</span> Ether</div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>Only Owner</h1>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-sm-4">
+                <h3><button id="pauseContract">Pause Contract</button></h3>
+                <b><p><div id="pauseContractStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3><button id="resumeContract">Resume Contract</button></h3>
+                <b><p><div id="resumeContractStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3><button id="stopContract">Stop Contract</button></h3>
+                <b><p><div id="stopContractStatus"></div></p></b>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>Change Owner</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>New Owner Address:</td><td><input name="newOwnerAddress" type="text" placeholder="Enter the New Owner Address" /></td></tr>
+                            <tr><td></td><td><button id="changeOwner">Change</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="changeOwnerStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3>Add Resolver</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Resolver Address:</td><td><input name="newResolverAddress" type="text" placeholder="Enter the Resolver Address" /></td></tr>
+                            <tr><td></td><td><button id="addResolver">Add</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="addResolverStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3>Update Resolver</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Resolver Address:</td><td><input name="updateResolverAddress" type="text" placeholder="Enter the Resolver Address" /></td></tr>
+                            <tr><td>New Status:</td><td><input name="newResolverStatus" type="number" placeholder="0 = Invalid, 1 = Valid" /></td></tr>
+                            <tr><td></td><td><button id="updateResolver">Update</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="updateResolverStatus"></div></p></b>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>Only Resolver</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>Solve Dispute</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Dispute Index:</td><td><input name="disputeIndex" type="number" placeholder="Enter the Dispute Index" /></td></tr>
+                            <tr><td>Vote:</td><td><input name="newDisputeStatus" type="number" placeholder="0 = No, 1 = Yes to Hunter" /></td></tr>
+                            <tr><td></td><td><button id="solveDispute">Vote</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="solveDisputeStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3>Check Bounty</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Bounty ID</td><td><input name="checkBountyID" type="number" placeholder="Enter the Bounty ID" /></td></tr>
+                            <tr><td></td><td><button id="checkBounty">Check</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="checkBountyStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3>Check Solution</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Solution ID</td><td><input name="checkSolutionID" type="number" placeholder="Enter the Bounty ID" /></td></tr>
+                            <tr><td></td><td><button id="checkSolution">Check</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="checkSolutionStatus"></div></p></b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Dispute Queue</h3>
+                <div>
+                    <div id="disputeQueueStatus"></div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>Users</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>Create Bounty</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Description:</td><td><input name="bountyDescription" type="text" placeholder="Enter description" /></td></tr>
+                            <tr><td>Valid Till (in Seconds):</td><td><input name="bountyDeadline" type="number" placeholder="0 for Forever" /></td></tr>
+                            <tr><td>Amount:</td><td><input name="bountyAmount" type="number" placeholder="Enter the amount in Ether" /></td></tr>
+                            <tr><td></td><td><button id="createBounty">Create</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="bountyIDCreated"></div></p></b>
+                <b><p><div id="createBountyStatus"></div></p></b>
+            </div>
+            <div class="col-sm-6">
+                <h3>Close Bounty</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Bounty ID:</td><td><input name="closeBountyID" type="number" placeholder="Enter the bounty ID" /></td></tr>
+                            <tr><td></td><td><button id="closeBounty">Close</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="closeBountyStatus"></div></p></b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>Accept Solution</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Solution ID:</td><td><input name="acceptSolutionID" type="number" placeholder="Enter the solution ID" /></td></tr>
+                            <tr><td></td><td><button id="acceptSolution">Accept</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="acceptSolutionStatus"></div></p></b>
+            </div>
+            <div class="col-sm-6">
+                <h3>Reject Solution</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Solution ID:</td><td><input name="rejectSolutionID" type="number" placeholder="Enter the solution ID" /></td></tr>
+                            <tr><td>Comment:</td><td><input name="comment" type="text" placeholder="Enter why you rejected it?" /></td></tr>
+                            <tr><td></td><td><button id="rejectSolution">Reject</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="rejectSolutionStatus"></div></p></b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>Add Solution</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Bounty ID:</td><td><input name="bountyID" type="number" placeholder="Enter the bounty ID" /></td></tr>
+                            <tr><td>Solution:</td><td><input name="solution" type="text" placeholder="Enter solution" /></td></tr>
+                            <tr><td>Linked Solution:</td><td><input name="linkedSolution" type="number" placeholder="0 (Zero) if none" /></td></tr>
+                            <tr><td></td><td><button id="addSolution">Add</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="solutionIDCreated"></div></p></b>
+                <b><p><div id="addSolutionStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3>Raise Dispute</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Solution ID:</td><td><input name="disputeSolutionID" type="number" placeholder="Enter the solution ID" /></td></tr>
+                            <tr><td></td><td><button id="raiseDispute">Dispute</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="raiseDisputeStatus"></div></p></b>
+            </div>
+            <div class="col-sm-4">
+                <h3>Withdraw</h3>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr><td>Amount:</td><td><input name="amount" type="number" placeholder="Enter value in Ether" /></td></tr>
+                            <tr><td></td><td><button id="withdraw">Withdraw</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <b><p><div id="withdrawStatus"></div></p></b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Bounties I have posted</h3>
+                <div>
+                    <div id="bountyQueueStatus"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Solutions I have posted</h3>
+                <div>
+                    <div id="solutionQueueStatus"></div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>All bounties in the system</h3>
+                <div>
+                    <div id="completeBountyQueueStatus"></div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        </center>
+    </div>
+    <script src="js/app.js"></script>
+    </body>
+<html>
