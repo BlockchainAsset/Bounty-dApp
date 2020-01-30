@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "webpack-cli --mode development && http-server ./build/app -a 0.0.0.0 -p 8080 -c-1",
-    "build": "truffle compile && webpack-cli --mode development",
+    "build": "webpack-cli --mode development",
     "test": "bash startGanache.sh && truffle test && bash stopGanache.sh"
   },
   "repository": {
