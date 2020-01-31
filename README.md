@@ -70,25 +70,47 @@ If there comes a situation, where there is a dispute, it could be solved by the 
 
 ## How to Run the Project
 
-1. First clone this repo
+1. Create a new folder
+
+2. Copy the Git Clone URL from GitHub: https://github.com/remedcu/Bounty-dApp.git
 
 `git clone https://github.com/remedcu/Bounty-dApp.git`
 
-2. For this and some other step, you need to have Truffle & other modules installed in your system. Enter the Bounty-dApp folder and please run:
+3. Clone the Repository
 
-`npm install` OR `npm i`
+4. In a command line, inside the Bounty-dApp folder write `npm i` or `npm install`
 
-# 3. [To Do]
+5. Copy the .dotenv file and paste it in the Bounty-dApp file as .env (Edit the values only if deemed necessary)
+
+6. Now run 'ganache-cli' and copy the address and private key part for later use.
+
+7. In a separate tab, run `truffle compile` in the command line
+
+8. In a command line, run `truffle migrate --reset`
+
+9. Now run 'npm start' to start the server. Open the link specified in the browser.
+
+10. In the same browser, using Metamask, add your network with Port 8545.
+
+11. Also, add atleast the first 7 accounts to the MetaMask (1st Owner, 2nd - 4th Resolvers, 5th Bounty Creator and 6th - 7th Bounty Hunter)
+
+12. (Optional) If you want, you can run `truffle test` to see if it passes all tests or not (*One test is time depended for 30 seconds by default, it is not stuck*)
+
+Important: Add the resolvers before you want to solve disputes (solveDispute Function call).
 
 ## How to Test the Contract
 
-1. Please follow the step 1 - 2 of *How to Run the Project*.
+1. Please follow the step 1 - 5 of *How to Run the Project*.
 
 2. Now start the test using:
 
 `npm test`
 
 Note: You can also use `truffle test` to test the smart contract, if you already have `ganache-cli` or Ganache GUI running in the background for testing in local network.
+
+## Testnet Deployment:
+
+Deployed Contract address for Rinkeby and Ropsten can be found in deployed_addresses.txt file in this repository.
 
 ## Tests written:
 

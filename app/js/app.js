@@ -52,19 +52,20 @@ async function updateData(bountydAppv1) {
                 for(let j=0;j < disputeQueueLength; j++){
                     let solutionID = await bountydAppv1.disputeQueue(j);
                     let solution = await bountydAppv1.solutions(solutionID)
-                    let resolverVote = await bountydAppv1.disputeQueueVotes(j, i);
-                    if (resolverVote == 0){
-                        resolverVote = "Against"
-                    }
-                    else{
-                        resolverVote = "In Favor"
-                    }
-                    let resolverSigned = await bountydAppv1.disputeQueueSigner(j, i);
+                    let resolverVote = await bountydAppv1.disputeQueueVotes(solutionID, i);
+                    let resolverSigned = await bountydAppv1.disputeQueueSigner(solutionID, i);
                     if (resolverSigned == 0){
-                        resolverSigned = "Completed"
+                        resolverSigned = "To Do"
+                        resolverVote = "To Do"
                     }
                     else{
-                        resolverSigned = "To Do"
+                        resolverSigned = "Completed"
+                        if (resolverVote == 0){
+                            resolverVote = "Against"
+                        }
+                        else{
+                            resolverVote = "In Favor"
+                        }
                     }
                     disputeQueue += '<tr><th scope="row">'+j+'</td><td>'+solution.bountyID+'</td><td>'+solutionID+'</td><td>'+resolverSigned+'</td><td>'+resolverVote+'</td></tr>';
                 }
@@ -177,7 +178,7 @@ async function updateData(bountydAppv1) {
 
     // Complete Bounty List
     let completeBountyQueueLength = await bountydAppv1.bountyID({from: currentUser});
-    let completeBountyQueue = '<table class="table"><thead class="thead-dark"><tr><th scope="col">Bounty ID</th><th scope="col">Bounty Creator</th><th scope="col">Description</th><th scope="col">Deadline</th><th scope="col">Solution List</th><th scope="col">Accepted Solution</th><th scope="col">Amount</th><th scope="col">Status</th></tr></thead><tbody>';
+    let completeBountyQueue = '<table class="table"><thead class="thead-dark"><tr><th scope="col">Bounty ID</th><th scope="col">Bounty Creator</th><th scope="col">Description</th><th scope="col">Deadline</th><th scope="col">Accepted Solution</th><th scope="col">Amount</th><th scope="col">Status</th></tr></thead><tbody>';
     for(let i=1;i <= completeBountyQueueLength; i++){
         let bounties = await bountydAppv1.bounties(i);
         let bountyID = i;
@@ -196,16 +197,6 @@ async function updateData(bountydAppv1) {
             var minutes = "0" + date.getMinutes();
             var seconds = "0" + date.getSeconds();
             convdataTime = month+'-'+day+'-'+year+' '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);    
-        }
-
-        // Getting the added Solutions to Bounty
-        let bountyToSolutionQueueLength = await bountydAppv1.bountyToSolutionListLength(bountyID);
-        var solutionList = 'None Yet';
-        if (bountyToSolutionQueueLength > 0) {
-            solutionList = '';
-            for(let i = 0; i < bountyToSolutionQueueLength; i++) {
-                solutionList += await bountydAppv1.bountyToSolutionList(bountyID, i) + '<br>';
-            }
         }
 
         // Getting the Accepted Solution ID
@@ -228,7 +219,6 @@ async function updateData(bountydAppv1) {
         '</td><td>'+bounties.bountyCreator+
         '</td><td>'+bounties.description+
         '</td><td>'+convdataTime+
-        '</td><td>'+solutionList+
         '</td><td>'+acceptedSolutionID+
         '</td><td>'+fromWei(bounties.amount)+
         ' ETH</td><td>'+bountyStatus+'</td></tr>';
@@ -274,14 +264,13 @@ async function pauseContract() {
             $('#pauseContractStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#pauseContractStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#pauseContractStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        let message = JSON.stringify(err.message).split('reason')[1].split('\"')[2].slice(0,-1);
-        $('#pauseContractStatus').html(message);
+        $('#pauseContractStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -311,14 +300,13 @@ async function resumeContract() {
             $('#resumeContractStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#resumeContractStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#resumeContractStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        let message = JSON.stringify(err.message).split('reason')[1].split('\"')[2].slice(0,-1);
-        $('#resumeContractStatus').html(message);
+        $('#resumeContractStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -348,14 +336,13 @@ async function stopContract() {
             $('#stopContractStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#stopContractStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#stopContractStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        let message = JSON.stringify(err.message).split('reason')[1].split('\"')[2].slice(0,-1);
-        $('#stopContractStatus').html(message);
+        $('#stopContractStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -384,13 +371,13 @@ async function changeOwner() {
             $('#changeOwnerStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#changeOwnerStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#changeOwnerStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#changeOwnerStatus').html(err.message);
+        $('#changeOwnerStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -419,13 +406,13 @@ async function addResolver() {
             $('#addResolverStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#addResolverStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#addResolverStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#addResolverStatus').html(err.message);
+        $('#addResolverStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -457,13 +444,13 @@ async function updateResolver() {
             $('#updateResolverStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#updateResolverStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#updateResolverStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#updateResolverStatus').html(err.message);
+        $('#updateResolverStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -481,7 +468,7 @@ async function solveDispute() {
             { from: currentUser }
         ).on(
             'transactionHash',
-            txHash => $('#updateResolverStatus').html('Transaction on the way ' + txHash)
+            txHash => $('#solveDisputeStatus').html('Transaction on the way ' + txHash)
         );
 
         const receipt = txObj.receipt;
@@ -489,20 +476,16 @@ async function solveDispute() {
         if (!receipt.status) {
             console.error('Wrong Status');
             console.error(receipt);
-            $('#updateResolverStatus').html('There was an error in the tx execution, status not 1');
-        } else if (receipt.logs.length == 0) {
-            console.error('Empty logs');
-            console.error(receipt);
-            $('#updateResolverStatus').html('There was an error in the tx execution, missing expected event');
+            $('#solveDisputeStatus').html('There was an error in the tx execution, status not 1');
         } else {
             console.log(receipt.logs[0]);
-            $('#updateResolverStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#solveDisputeStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#updateResolverStatus').html(err.message);
+        $('#solveDisputeStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -522,7 +505,7 @@ async function checkBounty() {
         $('#checkBountyStatus').html(checkBounty);
 
     } catch (err) {
-        $('#checkBountyStatus').html(err.message);
+        $('#checkBountyStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -542,7 +525,7 @@ async function checkSolution() {
         $('#checkSolutionStatus').html(checkSolution);
 
     } catch (err) {
-        $('#checkSolutionStatus').html(err.message);
+        $('#checkSolutionStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -586,14 +569,14 @@ async function createBounty() {
             $('#createBountyStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#createBountyStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#createBountyStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
             $('#bountyIDCreated').html('Bounty ID: '+receipt.logs[1].args.bountyID);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#createBountyStatus').html(err.message);
+        $('#createBountyStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -623,13 +606,13 @@ async function closeBounty() {
             $('#closeBountyStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#closeBountyStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#closeBountyStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#closeBountyStatus').html(err.message);
+        $('#closeBountyStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -659,13 +642,13 @@ async function acceptSolution() {
             $('#acceptSolutionStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#acceptSolutionStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#acceptSolutionStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#acceptSolutionStatus').html(err.message);
+        $('#acceptSolutionStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -697,13 +680,13 @@ async function rejectSolution() {
             $('#rejectSolutionStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#rejectSolutionStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#rejectSolutionStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#rejectSolutionStatus').html(err.message);
+        $('#rejectSolutionStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -738,14 +721,14 @@ async function addSolution() {
             $('#addSolutionStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#addSolutionStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#addSolutionStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
             $('#solutionIDCreated').html('Solution ID: '+receipt.logs[0].args.solutionID);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#createBountyStatus').html(err.message);
+        $('#createBountyStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -775,13 +758,13 @@ async function raiseDispute() {
             $('#raiseDisputeStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#raiseDisputeStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#raiseDisputeStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#raiseDisputeStatus').html(err.message);
+        $('#raiseDisputeStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }
@@ -810,13 +793,13 @@ async function withdraw() {
             $('#withdrawStatus').html('There was an error in the tx execution, missing expected event');
         } else {
             console.log(receipt.logs[0]);
-            $('#withdrawStatus').html('Transfer executed with Tx Hash: '+receipt.transactionHash);
+            $('#withdrawStatus').html('Transaction executed with Tx Hash: '+receipt.transactionHash);
         }
 
         updateData(bountydAppv1);
 
     } catch (err) {
-        $('#withdrawStatus').html(err.message);
+        $('#withdrawStatus').html("Error: Check Console for Complete Log");
         console.error(err);
     }
 }

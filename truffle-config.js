@@ -66,13 +66,13 @@ module.exports = {
    rinkeby: {
      provider: () => new HDWalletProvider(rinkebyMnemonic, infuraRinkebyKey),
      network_id: 4,          // Rinkeby's network id
-     gas: 5500000,        
+     gas: 9990000,
    },
 
    ropsten: {
     provider: () => new HDWalletProvider(ropstenMnemonic, infuraRopstenKey),
     network_id: 3,          // Ropsten's network id
-    gas: 5500000,
+    gas: 8000000,
    },
 
   // Useful for deploying to a public network.
