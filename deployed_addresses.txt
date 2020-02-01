@@ -1,5 +1,5 @@
-Rinkeby Address: 0xE302D73f87A5F1899c287BB8175b6C7fCBA99076
-Rinkeby Link: https://rinkeby.etherscan.io/address/0xe302d73f87a5f1899c287bb8175b6c7fcba99076
+Rinkeby Address: 0xc5a7FE271d0D23d199787A4fB41945819774d8b0
+Rinkeby Link: https://rinkeby.etherscan.io/address/0xc5a7FE271d0D23d199787A4fB41945819774d8b0
 
-Ropsten Address: 0x49E0a3D2CC0a251C2BDb247a6d89De71E3171FCF
-Ropsten Link: https://ropsten.etherscan.io/address/0x49E0a3D2CC0a251C2BDb247a6d89De71E3171FCF
+Ropsten Address: 0x6af4205847826036b75899991dec4d4e40c9befd
+Ropsten Link: https://ropsten.etherscan.io/address/0x6af4205847826036b75899991dec4d4e40c9befd
