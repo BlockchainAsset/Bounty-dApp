@@ -36,7 +36,7 @@
     "truffle-hdwallet-provider": "^1.0.17",
     "truffle-security": "^1.6.2",
     "webpack-cli": "^3.3.10",
-    "jquery": "3.5.0",
+    "jquery": "3.5.1",
     "truffle-contract": "4.0.23",
     "http-server": "^0.11.1"
   },
