@@ -37,7 +37,7 @@
     "truffle-security": "^1.6.2",
     "webpack-cli": "^3.3.10",
     "jquery": "3.5.0",
-    "truffle-contract": "4.0.23",
+    "truffle-contract": "4.0.31",
     "http-server": "^0.11.1"
   },
   "devDependencies": {
