@@ -35,13 +35,13 @@
     "truffle-assertions": "^0.9.2",
     "truffle-hdwallet-provider": "^1.0.17",
     "truffle-security": "^1.6.2",
-    "webpack-cli": "^3.3.10",
+    "webpack-cli": "^4.2.0",
     "jquery": "3.5.0",
     "truffle-contract": "4.0.31",
-    "http-server": "^0.11.1"
+    "http-server": "^0.12.3"
   },
   "devDependencies": {
     "webpack": "^4.41.5",
-    "file-loader": "^4.0.0"
+    "file-loader": "^6.2.0"
   }
 }
