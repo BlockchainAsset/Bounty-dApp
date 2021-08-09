@@ -38,7 +38,7 @@
     "webpack-cli": "^4.2.0",
     "jquery": "3.6.0",
     "truffle-contract": "4.0.31",
-    "http-server": "^0.12.3"
+    "http-server": "^13.0.0"
   },
   "devDependencies": {
     "webpack": "^5.4.0",
